@@ -1,11 +1,9 @@
-# System Info API — DevOps Portfolio Project
+# System Info API
 
 ![CI](https://github.com/alex2frisky/system-info-api/actions/workflows/ci.yml/badge.svg)
 ![CD](https://github.com/alex2frisky/system-info-api/actions/workflows/cd.yml/badge.svg)
 
-A production-grade DevOps pipeline built around a simple Flask API that returns system information. The application itself is intentionally simple — **the focus is entirely on the DevOps infrastructure surrounding it**.
-
-Built as a portfolio project demonstrating real-world DevOps practices: containerization, CI/CD automation, container orchestration, infrastructure as code, and complete observability.
+A Flask-based REST API that provides real-time system information (CPU, memory, disk usage) with complete DevOps automation: containerization, CI/CD, Kubernetes orchestration, infrastructure as code, and monitoring.
 
 ---
 
@@ -61,7 +59,7 @@ Built as a portfolio project demonstrating real-world DevOps practices: containe
 
 ---
 
-## 🚀 Quick Start (Local)
+## 🚀 Quick Start
 
 ### Prerequisites
 
@@ -73,10 +71,10 @@ Built as a portfolio project demonstrating real-world DevOps practices: containe
 
 ```bash
 # Clone the repository
-git clone git@github.com:alex2frisky/system-info-api.git
+git clone https://github.com/alex2frisky/system-info-api.git
 cd system-info-api
 
-# Start everything (Flask + nginx + Prometheus + Grafana)
+# Start the full stack (Flask + nginx + Prometheus + Grafana)
 docker-compose up -d
 
 # Wait 30 seconds for all services to start
@@ -86,20 +84,12 @@ curl http://localhost:8080/
 curl http://localhost:8080/health
 curl http://localhost:8080/info
 curl http://localhost:8080/metrics
-
-# Access services
-# API:        http://localhost:8080
-# Grafana:    http://localhost:3000 (admin/admin)
-# Prometheus: http://localhost:9090
 ```
 
-### View Live Dashboards
-
-Open Grafana at `http://localhost:3000` (admin/admin) to see:
-- Real-time nginx request rate
-- System CPU, memory, and disk usage
-- Flask request counter
-- Connection states
+**Access the services:**
+- API: http://localhost:8080
+- Grafana: http://localhost:3000 (admin/admin)
+- Prometheus: http://localhost:9090
 
 ---
 
@@ -108,7 +98,7 @@ Open Grafana at `http://localhost:3000` (admin/admin) to see:
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | `/` | GET | Service information and endpoint list |
-| `/health` | GET | Health check (Kubernetes probes use this) |
+| `/health` | GET | Health check (used by Kubernetes probes) |
 | `/info` | GET | Detailed system information (CPU, memory, disk, uptime) |
 | `/metrics` | GET | Prometheus metrics in text exposition format |
 
@@ -153,20 +143,15 @@ $ curl http://localhost:8080/info
 
 ---
 
-## ☸️ Deploy to Kubernetes (minikube)
+## ☸️ Kubernetes Deployment
 
-### Prerequisites
-
-- minikube installed
-- kubectl installed
-
-### Deploy
+### Deploy to minikube
 
 ```bash
 # Start minikube
 minikube start --driver=docker
 
-# Deploy to Kubernetes
+# Deploy application
 kubectl apply -f k8s/
 
 # Wait for pods to be ready
@@ -177,37 +162,21 @@ kubectl wait --for=condition=ready pod \
 
 # Access the service
 minikube service system-info-service -n system-info
-# Opens browser automatically
 ```
 
 ### Update Deployment
 
 ```bash
-# After pushing a new image to Docker Hub
+# Restart pods to pull latest image
 kubectl rollout restart deployment/system-info-api -n system-info
 kubectl rollout status deployment/system-info-api -n system-info
 ```
 
-### Demonstrate Self-Healing
-
-```bash
-# Delete a pod
-kubectl delete pod $(kubectl get pods -n system-info -o name | head -1) -n system-info
-
-# Watch Kubernetes create a replacement immediately
-kubectl get pods -n system-info --watch
-```
-
 ---
 
-## 🏗️ Deploy to AWS
+## 🏗️ AWS Deployment
 
-### Prerequisites
-
-- AWS CLI configured (`aws configure`)
-- Terraform installed
-
-### Deploy
+### Deploy Infrastructure
 
 ```bash
 cd terraform
@@ -220,26 +189,18 @@ terraform plan
 
 # Create infrastructure
 terraform apply
-# Type: yes
 
 # Wait 3-5 minutes for EC2 to boot and start Docker
-
-# Get the public IP
-terraform output public_ip
-
-# Test
+# Test the deployment
 curl http://$(terraform output -raw public_ip)/info
 ```
 
-### Destroy (IMPORTANT!)
+### Destroy Infrastructure
 
 ```bash
-# Always destroy when done to avoid charges
+# Always destroy when done to avoid AWS charges
 terraform destroy
-# Type: yes
 ```
-
-**Cost:** ~$0.017/hour (~$0.40/day if you forget to destroy)
 
 ---
 
@@ -251,27 +212,38 @@ pip install -r tests/requirements.txt
 
 # Run all tests
 pytest tests/ -v
-
-# Expected: 12 tests pass
 ```
+
+All tests validate:
+- API endpoint responses
+- Health check functionality
+- System data accuracy
+- Prometheus metrics format
+- Request counter functionality
 
 ---
 
 ## 📈 Monitoring
 
-The project includes a complete observability stack:
+### Prometheus
 
-**Prometheus** collects metrics from:
+Collects metrics from:
 - nginx (via nginx-prometheus-exporter)
-- Flask application `/metrics` endpoint
+- Flask application (`/metrics` endpoint)
 
-**Grafana** visualizes:
+Access at: http://localhost:9090
+
+### Grafana
+
+Pre-configured dashboards showing:
 - nginx request rate and active connections
-- System CPU, memory, and disk usage (from Flask)
+- System CPU, memory, and disk usage
 - Flask request counter
 - Connection states
 
-The Grafana dashboard is **provisioned as code** — stored in `grafana/provisioning/dashboards/system-info.json` and automatically loaded on startup.
+Access at: http://localhost:3000 (admin/admin)
+
+**Dashboard provisioning:** The Grafana dashboard is stored as code in `grafana/provisioning/dashboards/system-info.json` and automatically loaded on startup.
 
 ---
 
@@ -282,25 +254,45 @@ The Grafana dashboard is **provisioned as code** — stored in `grafana/provisio
 **Triggers:** Every push to any branch
 
 **Steps:**
-1. Checkout code
-2. Set up Python 3.11
-3. Install dependencies
-4. Run pytest test suite
-5. Verify Docker build succeeds
-
-If any step fails → ❌ GitHub shows red X, blocks merge
+1. Run pytest test suite
+2. Verify Docker build succeeds
 
 ### Continuous Deployment (`cd.yml`)
 
-**Triggers:** Push to `main` branch only (after CI passes)
+**Triggers:** Push to `main` branch (after CI passes)
 
 **Steps:**
-1. Checkout code
-2. Set up Docker Buildx
-3. Login to Docker Hub
-4. Build for both `linux/amd64` and `linux/arm64`
-5. Tag with `latest` and `sha-{commit}`
-6. Push to Docker Hub
+1. Build Docker image for `linux/amd64` and `linux/arm64`
+2. Tag with `latest` and `sha-{commit}`
+3. Push to Docker Hub
+
+---
+
+## 💡 Key Features
+
+### Application Design
+
+- Simple Flask API focused on system information
+- No database or complex business logic
+- Production-ready patterns: health checks, metrics, logging
+
+### DevOps Infrastructure
+
+- **Containerization**: Multi-stage Docker builds, non-root containers
+- **CI/CD**: Automated testing and deployment on every commit
+- **Orchestration**: Kubernetes with 2 replicas, health probes, resource limits
+- **Infrastructure as Code**: Complete AWS environment in Terraform
+- **Monitoring**: Prometheus + Grafana with dashboards as code
+- **Multi-architecture**: Supports both arm64 (Mac M series) and amd64 (servers)
+
+### Production Patterns
+
+- Grafana dashboards provisioned from Git
+- Sidecar pattern (nginx + Flask in same pod)
+- Health checks at every level (Docker, Kubernetes, AWS)
+- Resource limits to prevent resource contention
+- Rolling updates for zero-downtime deployments
+- Immutable infrastructure (destroy and recreate identically)
 
 ---
 
@@ -315,142 +307,53 @@ system-info-api/
 ├── docker-compose.yml              # Full local stack
 ├── prometheus.yml                  # Prometheus scrape config
 │
-├── grafana/
-│   └── provisioning/               # Dashboards as code
-│       ├── datasources/
-│       │   └── prometheus.yml
-│       └── dashboards/
-│           ├── dashboards.yml
-│           └── system-info.json    # Grafana dashboard JSON
+├── grafana/provisioning/           # Dashboards as code
+│   ├── datasources/
+│   │   └── prometheus.yml
+│   └── dashboards/
+│       ├── dashboards.yml
+│       └── system-info.json
 │
-├── tests/
-│   ├── test_api.py                 # Flask endpoint tests
-│   └── requirements.txt            # Test dependencies
+├── tests/                          # Automated tests
+│   ├── test_api.py
+│   └── requirements.txt
 │
-├── .github/workflows/
-│   ├── ci.yml                      # Test + build verification
-│   └── cd.yml                      # Build + push to Docker Hub
+├── .github/workflows/              # CI/CD pipelines
+│   ├── ci.yml
+│   └── cd.yml
 │
-├── k8s/
+├── k8s/                            # Kubernetes manifests
 │   ├── namespace.yaml
 │   ├── configmap.yaml
 │   ├── nginx-config.yaml
-│   ├── deployment.yaml             # 2 replicas (Flask + nginx sidecar)
+│   ├── deployment.yaml
 │   └── service.yaml
 │
-├── terraform/
-│   ├── main.tf                     # AWS infrastructure
+├── terraform/                      # AWS infrastructure
+│   ├── main.tf
 │   ├── variables.tf
 │   ├── outputs.tf
-│   └── terraform.tfvars            # Your values (gitignored)
+│   └── terraform.tfvars
 │
-├── scripts/                        # Helper scripts
 ├── Makefile                        # Unified commands
-├── .gitignore
-├── .dockerignore
-└── README.md                       # This file
+└── README.md
 ```
 
 ---
 
-## 💡 Key DevOps Concepts Demonstrated
+## 🛠️ Makefile Commands
 
-### Containerization
-- Multi-stage Docker builds (builder + runtime)
-- Non-root user in containers
-- Health checks built into images
-- Multi-architecture support (arm64 + amd64)
-
-### CI/CD
-- Automated testing on every commit
-- Security through branch protection
-- Immutable artifacts (sha-tagged images)
-- Separation of CI (test) and CD (deploy)
-
-### Kubernetes
-- Deployment with replica management
-- Liveness and readiness probes
-- Resource requests and limits
-- ConfigMap for configuration
-- Sidecar pattern (nginx alongside Flask)
-- LoadBalancer service
-- Rolling updates with zero downtime
-
-### Infrastructure as Code
-- Complete AWS environment defined in Terraform
-- Reproducible infrastructure
-- Version-controlled infrastructure changes
-- State management
-
-### Observability
-- Metrics collection (Prometheus)
-- Visualization (Grafana)
-- Dashboards as code (stored in Git)
-- Application metrics + infrastructure metrics
-- Multi-source monitoring (nginx + Flask)
-
+```bash
+make start       # Start local stack
+make stop        # Stop local stack
+make test        # Run automated tests
+make deploy-k8s  # Deploy to minikube
+make update-k8s  # Restart Kubernetes pods
+make k8s-status  # Show Kubernetes resources
+make clean       # Remove unused Docker resources
+```
 ---
 
-## 🎯 Why This Project Structure
-
-### Simple Application, Complex Infrastructure
-
-The Flask application is intentionally simple (120 lines). It returns system information — no database, no complex business logic, no authentication.
-
-**Why?**
-
-Because this is a **DevOps project**, not a backend project. The complexity and learning are in:
-- How the app is containerized
-- How it's tested automatically
-- How it's deployed consistently
-- How it's monitored in production
-- How the infrastructure is managed
-
-When debugging, 90% of issues will be DevOps issues (Docker, K8s, networking, configuration) rather than application bugs. That's intentional.
-
-### Production-Grade Practices
-
-- **Grafana dashboards as code** — most tutorials tell you to click in the UI
-- **Health checks everywhere** — Docker, K8s liveness/readiness, EC2 user data verification
-- **Multi-stage Docker builds** — smaller final images
-- **Non-root containers** — security best practice
-- **Resource limits** — prevents resource starvation
-- **Separation of concerns** — Flask generates data, nginx serves it, Prometheus collects it
-- **Sidecar pattern in K8s** — nginx and Flask in same pod
-
----
-
-## 📝 Interview Talking Points
-
-### "Why Flask instead of a static site?"
-
-> "A static site would work, but Flask lets me demonstrate a few additional concepts: application health endpoints that Kubernetes probes can use, custom Prometheus metrics from the application itself, and the sidecar pattern with nginx as a reverse proxy. It's still simple enough that 90% of my time was spent on DevOps, not debugging the app."
-
-### "Why the sidecar pattern in Kubernetes?"
-
-> "In the Kubernetes deployment, Flask and nginx run in the same pod as separate containers. This demonstrates the sidecar pattern — nginx handles TLS termination, request buffering, and static asset caching, while Flask focuses purely on generating dynamic responses. It's a common production pattern."
-
-### "Why both local and AWS?"
-
-> "minikube is for development and demonstrating Kubernetes features live in interviews — self-healing, rolling updates, scaling. AWS deployment via Terraform shows I can translate that to real cloud infrastructure. Both use the same Docker image, showing true environment consistency."
-
-### "What would you add for production?"
-
-> "For real production: HTTPS with a proper certificate, horizontal pod autoscaling based on actual traffic patterns, a production Kubernetes cluster instead of minikube, centralized logging with something like ELK or Loki, distributed tracing, and likely a database for storing historical system stats. But those additions would triple the complexity for diminishing portfolio value."
-
----
-
-## 🧑‍💼 About
-
-**Built by:** [Your Name]  
-**Background:** 10 years in production support → DevOps engineer  
-**GitHub:** [github.com/alex2frisky](https://github.com/alex2frisky)  
-**LinkedIn:** [linkedin.com/in/YOUR-PROFILE](https://linkedin.com/in/YOUR-PROFILE)
-
-This project was built to demonstrate production-grade DevOps practices. The system information API serves as a simple, reliable payload — the real value is in the automation, monitoring, and infrastructure surrounding it.
-
----
-
-## 📄 License
-
-MIT License — feel free to use this project structure for your own portfolio.
+**Built by:** Alex B
+**GitHub:** [@YOUR-USERNAME](https://github.com/alex2frisky)  
+**LinkedIn:** [linkedin.com/in/YOUR-PROFILE](https://linkedin.com/in/alexbazilescu)
