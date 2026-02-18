@@ -355,5 +355,5 @@ make clean       # Remove unused Docker resources
 ---
 
 **Built by:** Alex B
-**GitHub:** [@YOUR-USERNAME](https://github.com/alex2frisky)  
-**LinkedIn:** [linkedin.com/in/YOUR-PROFILE](https://linkedin.com/in/alexbazilescu)
+**GitHub:** [@alex2frisky](https://github.com/alex2frisky)  
+**LinkedIn:** [linkedin.com/in/alexbazilescu](https://linkedin.com/in/alexbazilescu)
