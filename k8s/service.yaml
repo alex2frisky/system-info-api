@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: system-info-service
+  namespace: system-info
+  labels:
+    app: system-info-api
+spec:
+  type: LoadBalancer
+  selector:
+    app: system-info-api
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
