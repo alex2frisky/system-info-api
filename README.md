@@ -21,7 +21,7 @@ A Flask-based REST API that provides real-time system information (CPU, memory, 
 ┌─────────────────────────────────────────────────────────────────┐
 │                      DOCKER HUB                                 │
 │                                                                 │
-│  Docker Image: username/system-info-api:latest                 │
+│  Docker Image: alex2frisky/system-info-api:latest                 │
 │                (multi-arch: amd64 + arm64)                      │
 └─────────────────────────────────────────────────────────────────┘
            ↓                                    ↓
@@ -339,20 +339,6 @@ system-info-api/
 └── README.md
 ```
 
----
-
-## 🛠️ Makefile Commands
-
-```bash
-make start       # Start local stack
-make stop        # Stop local stack
-make test        # Run automated tests
-make deploy-k8s  # Deploy to minikube
-make update-k8s  # Restart Kubernetes pods
-make k8s-status  # Show Kubernetes resources
-make clean       # Remove unused Docker resources
-```
----
 
 **Built by:** Alex B
 **GitHub:** [@alex2frisky](https://github.com/alex2frisky)  
