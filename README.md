@@ -102,45 +102,6 @@ curl http://localhost:8080/metrics
 | `/info` | GET | Detailed system information (CPU, memory, disk, uptime) |
 | `/metrics` | GET | Prometheus metrics in text exposition format |
 
-### Example Response
-
-```bash
-$ curl http://localhost:8080/info
-```
-
-```json
-{
-  "hostname": "abc123",
-  "platform": {
-    "system": "Linux",
-    "machine": "x86_64"
-  },
-  "cpu": {
-    "count": 8,
-    "percent": 15.2,
-    "per_cpu": [12.1, 14.3, 18.2, 16.5, 13.7, 15.8, 14.2, 17.1]
-  },
-  "memory": {
-    "total_gb": 16.0,
-    "used_gb": 8.5,
-    "available_gb": 7.5,
-    "percent": 53.1
-  },
-  "disk": {
-    "total_gb": 500.0,
-    "used_gb": 250.0,
-    "free_gb": 250.0,
-    "percent": 50.0
-  },
-  "uptime": {
-    "boot_time": "2024-01-15T10:30:00",
-    "uptime_seconds": 86400,
-    "uptime_hours": 24.0
-  },
-  "timestamp": "2024-01-16T10:30:00"
-}
-```
-
 ---
 
 ## ☸️ Kubernetes Deployment
