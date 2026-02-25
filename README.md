@@ -296,7 +296,6 @@ system-info-api/
 │   ├── outputs.tf
 │   └── terraform.tfvars
 │
-├── Makefile                        # Unified commands
 └── README.md
 ```
 
