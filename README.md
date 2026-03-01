@@ -3,7 +3,7 @@
 ![CI](https://github.com/alex2frisky/system-info-api/actions/workflows/ci.yml/badge.svg)
 ![CD](https://github.com/alex2frisky/system-info-api/actions/workflows/cd.yml/badge.svg)
 
-A simple Flask API that returns system info (CPU, memory, disk). Built mainly to learn and practice the DevOps tooling around it — Docker, Kubernetes, Terraform, GitHub Actions, Prometheus and Grafana.
+Flask REST API that exposes real-time system metrics (CPU, memory, disk) with a full DevOps stack: Docker, Kubernetes, Terraform, GitHub Actions, Prometheus, and Grafana.
 
 ---
 
