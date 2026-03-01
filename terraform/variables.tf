@@ -20,3 +20,9 @@ variable "docker_image" {
   description = "Docker image to deploy (e.g., username/system-info-api:latest)"
   type        = string
 }
+
+variable "public_key_path" {
+  description = "Path to your SSH public key (e.g., ~/.ssh/id_rsa.pub)"
+  type        = string
+  default     = "~/.ssh/id_rsa.pub"
+}

@@ -7,31 +7,22 @@ metadata:
     app: system-info-api
 spec:
   replicas: 2
-  
   selector:
     matchLabels:
       app: system-info-api
-  
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 0
-  
   template:
     metadata:
       labels:
         app: system-info-api
     spec:
       containers:
-        # Flask application container
         - name: app
           image: alex2frisky/system-info-api:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 5000
-              protocol: TCP
-          
+
+          # resource limits so it doesn't hog the cluster
           resources:
             requests:
               memory: "64Mi"
@@ -39,65 +30,22 @@ spec:
             limits:
               memory: "128Mi"
               cpu: "200m"
-          
+
+          # K8s uses these to know if the pod is healthy
           livenessProbe:
             httpGet:
               path: /health
               port: 5000
             initialDelaySeconds: 15
             periodSeconds: 30
-            timeoutSeconds: 5
-            failureThreshold: 3
-          
+
           readinessProbe:
             httpGet:
               path: /health
               port: 5000
             initialDelaySeconds: 10
             periodSeconds: 10
-            timeoutSeconds: 3
-            successThreshold: 1
-            failureThreshold: 3
-          
+
           envFrom:
             - configMapRef:
                 name: system-info-config
-        
-        # nginx reverse proxy sidecar
-        - name: nginx
-          image: nginx:alpine
-          ports:
-            - containerPort: 80
-              protocol: TCP
-          
-          volumeMounts:
-            - name: nginx-config
-              mountPath: /etc/nginx/conf.d
-              readOnly: true
-          
-          resources:
-            requests:
-              memory: "32Mi"
-              cpu: "50m"
-            limits:
-              memory: "64Mi"
-              cpu: "100m"
-          
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: 80
-            initialDelaySeconds: 10
-            periodSeconds: 30
-          
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: 80
-            initialDelaySeconds: 5
-            periodSeconds: 10
-      
-      volumes:
-        - name: nginx-config
-          configMap:
-            name: nginx-config

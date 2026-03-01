@@ -41,6 +41,12 @@ data "aws_ami" "amazon_linux_2" {
   }
 }
 
+# SSH key pair - reads your local public key and uploads it to AWS
+resource "aws_key_pair" "main" {
+  key_name   = "${var.project_name}-key"
+  public_key = file(var.public_key_path)
+}
+
 # VPC
 resource "aws_vpc" "main" {
   cidr_block           = "10.0.0.0/16"
@@ -87,13 +93,23 @@ resource "aws_route_table_association" "public" {
 # Security Group
 resource "aws_security_group" "web" {
   name        = "${var.project_name}-web-sg"
-  description = "Allow HTTP inbound"
+  description = "Allow HTTP and SSH inbound"
   vpc_id      = aws_vpc.main.id
 
   ingress {
     description = "HTTP"
     from_port   = 80
     to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # SSH open to the world for now - fine for a short-lived dev instance
+  # in a real setup you'd restrict this to your IP: ["x.x.x.x/32"]
+  ingress {
+    description = "SSH"
+    from_port   = 22
+    to_port     = 22
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -120,10 +136,10 @@ locals {
 
     yum update -y
     amazon-linux-extras install docker -y
-    
+
     systemctl start docker
     systemctl enable docker
-    
+
     usermod -aG docker ec2-user
 
     echo "=== Docker installed: $(docker --version) ==="
@@ -147,6 +163,7 @@ resource "aws_instance" "web" {
   instance_type          = var.instance_type
   subnet_id              = aws_subnet.public.id
   vpc_security_group_ids = [aws_security_group.web.id]
+  key_name               = aws_key_pair.main.key_name
   user_data              = local.user_data
 
   root_block_device {

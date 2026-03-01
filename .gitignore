@@ -1,20 +1,15 @@
 # Python
 __pycache__/
 *.py[cod]
-*$py.class
-.Python
+.venv/
 venv/
 env/
-ENV/
 *.egg-info/
-dist/
-build/
 .pytest_cache/
 
-# Environment & Secrets
+# Secrets / environment
 .env
 .env.*
-*.secret
 terraform.tfvars
 
 # Terraform
@@ -22,19 +17,10 @@ terraform.tfvars
 *.tfstate
 *.tfstate.*
 
-# Docker
-*.log
-
 # IDE
 .vscode/settings.json
 .idea/
 *.swp
-*.swo
 
 # Mac
 .DS_Store
-.AppleDouble
-.LSOverride
-
-# Jupyter
-.ipynb_checkpoints/

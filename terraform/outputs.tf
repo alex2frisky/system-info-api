@@ -1,11 +1,11 @@
+output "public_ip" {
+  description = "EC2 public IP"
+  value       = aws_eip.web.public_ip
+}
+
 output "website_url" {
   description = "URL to access the API"
   value       = "http://${aws_eip.web.public_ip}"
-}
-
-output "public_ip" {
-  description = "EC2 public IP address"
-  value       = aws_eip.web.public_ip
 }
 
 output "instance_id" {
@@ -13,25 +13,22 @@ output "instance_id" {
   value       = aws_instance.web.id
 }
 
-output "test_commands" {
-  description = "Commands to test the API"
+# reminder to test and destroy
+output "next_steps" {
   value = <<-EOT
+    Wait ~3-5 minutes for EC2 to boot and pull the Docker image.
 
-    ✅ Deployed successfully!
-
-    API URL: http://${aws_eip.web.public_ip}
-
-    Wait 3-5 minutes for EC2 to boot and start Docker.
-
-    Test commands:
-      curl http://${aws_eip.web.public_ip}/
+    Test it:
       curl http://${aws_eip.web.public_ip}/health
       curl http://${aws_eip.web.public_ip}/info
-      curl http://${aws_eip.web.public_ip}/metrics
 
-    ⚠️  DESTROY WHEN DONE:
+    SSH in to debug:
+      ssh ec2-user@${aws_eip.web.public_ip}
+
+    Check the bootstrap log on the instance:
+      sudo cat /var/log/user-data.log
+
+    Remember to destroy when done (this costs money):
       terraform destroy
-
-    Cost: ~$0.017/hour
   EOT
 }
