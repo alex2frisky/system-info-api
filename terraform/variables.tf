@@ -22,7 +22,7 @@ variable "docker_image" {
 }
 
 variable "public_key_path" {
-  description = "Path to your SSH public key (e.g., ~/.ssh/id_rsa.pub)"
+  description = "Path to your SSH public key (e.g., ~/.ssh/id_ed25519.pub)"
   type        = string
-  default     = "~/.ssh/id_rsa.pub"
+  default     = "~/.ssh/id_ed25519.pub"
 }
