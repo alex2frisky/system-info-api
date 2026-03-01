@@ -32,6 +32,15 @@ The app has four endpoints:
 
 ---
 
+## Prerequisites
+
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+- Python 3.11+
+- For Kubernetes: `kubectl` + `minikube`
+- For AWS: `terraform` + AWS CLI configured (`aws configure`)
+
+---
+
 ## Run locally with Docker Compose
 
 This starts the Flask app, nginx, Prometheus, and Grafana together.
