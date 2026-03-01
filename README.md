@@ -152,7 +152,7 @@ system-info-api/
 │   ├── ci.yml
 │   └── cd.yml
 ├── k8s/
-│   ├── namespace.yaml
+│   ├── 00-namespace.yaml
 │   ├── configmap.yaml
 │   ├── deployment.yaml
 │   └── service.yaml
