@@ -227,6 +227,7 @@ Needs `DOCKER_USERNAME` and `DOCKER_PASSWORD` set in GitHub secrets.
 pip install -r tests/requirements.txt
 make test
 # or: pytest tests/ -v
+# .venv/bin/pytest tests/ -v
 ```
 
 ---
