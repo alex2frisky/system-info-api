@@ -8,4 +8,4 @@ metadata:
 data:
   ENVIRONMENT: "production"
   APP_NAME: "system-info-api"
-  FLASK_ENV: "production"
+  FLASK_DEBUG: "0"

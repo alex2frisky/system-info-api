@@ -6,7 +6,7 @@ metadata:
   labels:
     app: system-info-api
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: system-info-api
   ports:

@@ -80,6 +80,7 @@ def test_request_counter_goes_up(client):
     response = client.get('/metrics')
     text = response.data.decode('utf-8')
 
+    count = 0
     for line in text.split('\n'):
         if line.startswith('flask_requests_total'):
             count = int(line.split()[-1])

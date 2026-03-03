@@ -44,7 +44,7 @@ data "aws_ami" "amazon_linux_2" {
 # SSH key pair - reads your local public key and uploads it to AWS
 resource "aws_key_pair" "main" {
   key_name   = "${var.project_name}-key"
-  public_key = file(var.public_key_path)
+  public_key = file(pathexpand(var.public_key_path))
 }
 
 # VPC
